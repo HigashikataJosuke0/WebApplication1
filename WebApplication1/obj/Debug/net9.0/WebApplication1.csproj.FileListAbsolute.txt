@@ -136,3 +136,4 @@ C:\Users\dante\RiderProjects\WebApplication1\WebApplication1\bin\Debug\net9.0\Mi
 C:\Users\dante\RiderProjects\WebApplication1\WebApplication1\bin\Debug\net9.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 C:\Users\dante\RiderProjects\WebApplication1\WebApplication1\bin\Debug\net9.0\Microsoft.IdentityModel.Tokens.dll
 C:\Users\dante\RiderProjects\WebApplication1\WebApplication1\bin\Debug\net9.0\System.IdentityModel.Tokens.Jwt.dll
+C:\Users\dante\RiderProjects\WebApplication1\WebApplication1\obj\Debug\net9.0\WebApplication1.sourcelink.json

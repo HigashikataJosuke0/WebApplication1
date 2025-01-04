@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace WebApplication1.model.dto;
+﻿namespace WebApplication1.model.dto;
 
 public class HabitsDto
 {

@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using WebApplication1.model;
 using WebApplication1.repository;
-using WebApplication1.model.dto;
-using WebApplication1.setvice;
 
 namespace WebApplication1.controller;
 

@@ -5,8 +5,6 @@ using WebApplication1.config;
 using WebApplication1.repository;
 using WebApplication1.setvice;
 
-// using WebApplication1.rabitmq;
-
 var builder = WebApplication.CreateBuilder(args);
 
 var services = builder.Services;
@@ -22,6 +20,8 @@ var configuration = builder.Configuration;
 
 
 // Добавляем репозитории
+services.AddSingleton<RabbitMqService>(sp => 
+    new RabbitMqService("amqp://guest:guest@localhost"));
 services.AddScoped<IUserRepository, UserRepository>();
 services.AddScoped<IRecordOfExecutionRepository, RecordOfExecutionRepository>();
 services.AddScoped<IHabitsRepository, HabitsRepository>();
@@ -36,28 +36,6 @@ services.AddSingleton<JwtProvider>();
 
 ApiExtensions.AddApiAuthentication(builder.Services,
     builder.Services.BuildServiceProvider().GetRequiredService<IOptions<JwtOptions>>());
-
-// //Регистрация Rabbit в Di - контейнер
-// builder.Services.Configure<RabbitMqOptions>(
-//     builder.Configuration.GetSection(RabbitMqOptions.SectionName));
-//
-// builder.Services.AddSingleton(serviceProvider =>
-// {
-//     // Получение конфигурации RabbitMqOptions из DI
-//     var options = serviceProvider.GetRequiredService<IOptions<RabbitMqOptions>>().Value;
-//
-//     // Валидация опций
-//     var validator = new RabbitMqOptions.Validator();
-//     var validationResult = validator.Validate(options);
-//     if (!validationResult.IsValid)
-//     {
-//         throw new Exception(
-//             $"Ошибка в настройках RabbitMQ: {string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage))}");
-//     }
-//
-//     return new RabbitMqClient(options);
-// });
-
 
 // Настройка подключения к PostgreSQL
 services.AddDbContext<ApplicationDbContext>(options =>
