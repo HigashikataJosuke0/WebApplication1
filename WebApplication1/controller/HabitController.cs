@@ -2,6 +2,7 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebApplication1.auto_mapper;
 using WebApplication1.model;
 using WebApplication1.model.dto;
 using WebApplication1.repository;
@@ -41,55 +42,38 @@ public class HabitController : ControllerBase
 
         return Ok(habits);
     }
-
-    //Валидация для DTO
-    public class HabitsDtoValidator : AbstractValidator<HabitsDto>
-    {
-        public HabitsDtoValidator()
-        {
-            RuleFor(x => x.Name).NotEmpty().WithMessage("Name is required.");
-            RuleFor(x => x.Discriminator).NotEmpty().WithMessage("Discriminator is required.");
-
-            When(x => x.Discriminator == "GoodHabits",
-                () => { RuleFor(x => x.Reward).NotEmpty().WithMessage("Reward is required for GoodHabits."); });
-
-            When(x => x.Discriminator == "BadHabits",
-                () => { RuleFor(x => x.Penalty).NotEmpty().WithMessage("Penalty is required for BadHabits."); });
-        }
-    }
-
+    
     [HttpPost]
     public async Task<IActionResult> CreateHabits([FromBody] HabitsDto habitsDto)
     {
         try
         {
-            // Валидация на основе типа
-            if (habitsDto.Discriminator == "GoodHabits" && string.IsNullOrEmpty(habitsDto.Reward))
-            {
-                return BadRequest(new { Message = "Reward is required for GoodHabits." });
-            }
+            var validator = new HabitsDtoValidator();
+            var validationResult = validator.Validate(habitsDto);
 
-            if (habitsDto.Discriminator == "BadHabits" && string.IsNullOrEmpty(habitsDto.Penalty))
+            if (!validationResult.IsValid)
             {
-                return BadRequest(new { Message = "Penalty is required for BadHabits." });
+                return BadRequest(new
+                {
+                    Message = "Validation failed.",
+                    Errors = validationResult.Errors.Select(e => e.ErrorMessage)
+                });
             }
+            
+            Habits habit = habitsDto.Discriminator switch
+            {
+                "GoodHabits" => _mapper.Map<GoodHabits>(habitsDto),
+                "BadHabits" => _mapper.Map<BadHabits>(habitsDto),
+                _ => null
+            };
 
-            Habits habit;
-
-            if (habitsDto.Discriminator == "GoodHabits")
+            if (habit == null)
             {
-                habit = _mapper.Map<GoodHabits>(habitsDto);
+                return BadRequest(new { Message = "Invalid habit type." });
             }
-            else if (habitsDto.Discriminator == "BadHabits")
-            {
-                habit = _mapper.Map<BadHabits>(habitsDto);
-            }
-            else
-            {
-                return BadRequest("Invalid habit type.");
-            }
-
+            
             await _habitRepository.CreateHabits(habit);
+
             return Ok(new { Message = "Habit created successfully." });
         }
         catch (Exception ex)

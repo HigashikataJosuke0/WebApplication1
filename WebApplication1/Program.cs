@@ -56,7 +56,6 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-// ApiExtensions.AddMappedEndPoints(app);
 UserEndPoints.MapEndpoints(app);
 var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 dbContext.Database.EnsureCreated();
